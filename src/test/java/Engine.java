@@ -4,7 +4,7 @@ public class Engine {
 
   public static void main(String[] args) {
     String[] gatlingArgs = {
-      "--simulation", "videogamedb.simulation.VideoGameDbSimulations",
+      "--simulation", "videogamedb.finalsimulation.VideoGameDbFullTest",
       "--results-folder", IDEPathHelper.resultsDirectory.toString()
     };
     Gatling.main(gatlingArgs);

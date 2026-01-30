@@ -58,7 +58,7 @@ public class VideoGameDbFeeders extends BaseSimulation {
                 String rating = RandomStringUtils.secure().nextAlphanumeric(4) + "-rating";
 
                 Map<String, Object> gameMap = new HashMap<>();
-                gameMap.put("gameName", gameName);
+                gameMap.put("name", gameName);
                 gameMap.put("releaseDate", releaseDate);
                 gameMap.put("reviewScore", reviewScore);
                 gameMap.put("category", category);
@@ -68,14 +68,14 @@ public class VideoGameDbFeeders extends BaseSimulation {
 
     private static final ChainBuilder createNewGame =
             feed(customCreateGameFeeder)
-                    .exec(http("Create New Game using Custom Feeder and JSON template - #{gameName} and #{gameId}")
+                    .exec(http("Create New Game using Custom Feeder and JSON template - #{name} and #{gameId}")
                             .post(VIDEO_GAME_ENDPOINT.getName())
                             .header(AUTH_HEADER, getAuthValue())
                             .body(ElFileBody("feeders/bodies/newGameTemplate.json")).asJson()
                             .check(status().is(200))
                             // id is always 0 when creating a new game
                             .check(jmesPath("id").exists())
-                            .check(jmesPath("name").isEL("#{gameName}"))
+                            .check(jmesPath("name").isEL("#{name}"))
                             .check(jmesPath("releaseDate").isEL("#{releaseDate}"))
                             .check(jmesPath("reviewScore").isEL("#{reviewScore}"))
                             .check(jmesPath("category").isEL("#{category}"))
@@ -93,7 +93,7 @@ public class VideoGameDbFeeders extends BaseSimulation {
                             .get(VIDEO_GAME_ENDPOINT.getName() + "/#{gameId}")
                             .header(AUTH_HEADER, getAuthValue())
                             .check(status().is(200))
-                            .check(jmesPath("name").isEL("#{gameName}"))
+                            .check(jmesPath("name").isEL("#{name}"))
                     );
 
     // id and name come from jsonFeeder
