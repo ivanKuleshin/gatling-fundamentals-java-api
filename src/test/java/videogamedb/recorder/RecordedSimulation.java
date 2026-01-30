@@ -1,15 +1,12 @@
-package videogamedb;
+package videogamedb.recorder;
 
-import java.time.Duration;
 import java.util.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
-import io.gatling.javaapi.jdbc.*;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
-import static io.gatling.javaapi.jdbc.JdbcDsl.*;
 
 public class RecordedSimulation extends Simulation {
 
@@ -82,21 +79,21 @@ public class RecordedSimulation extends Simulation {
       http("request_2")
         .post("/api/authenticate")
         .headers(headers_2)
-        .body(RawFileBody("videogamedb/recordedsimulation/0002_request.json"))
+        .body(RawFileBody("recorder/recordedsimulation/0002_request.json"))
     )
     .pause(25)
     .exec(
       http("request_3")
         .post("/api/videogame")
         .headers(headers_3)
-        .body(RawFileBody("videogamedb/recordedsimulation/0003_request.json"))
+        .body(RawFileBody("recorder/recordedsimulation/0003_request.json"))
     )
     .pause(10)
     .exec(
       http("request_4")
         .put("/api/videogame/3")
         .headers(headers_3)
-        .body(RawFileBody("videogamedb/recordedsimulation/0004_request.json"))
+        .body(RawFileBody("recorder/recordedsimulation/0004_request.json"))
     )
     .pause(7)
     .exec(

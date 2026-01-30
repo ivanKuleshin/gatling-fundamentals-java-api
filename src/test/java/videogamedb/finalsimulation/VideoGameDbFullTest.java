@@ -49,7 +49,7 @@ public class VideoGameDbFullTest extends Simulation {
                     .exec(http("Create New Game - #{name}")
                                     .post("/videogame")
                                     .header("Authorization", "Bearer #{jwtToken}")
-                                    .body(ElFileBody("bodies/newGameTemplate.json")).asJson());
+                                    .body(ElFileBody("feeders/bodies/newGameTemplate.json")).asJson());
 
     private static ChainBuilder getLastPostedGame =
             exec(http("Get Last Posted Game - #{name}")

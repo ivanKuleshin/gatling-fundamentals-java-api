@@ -1,8 +1,7 @@
 {
-  "id": #{id},
-  "name": "#{name}",
+  "name": "#{gameName}",
   "releaseDate": "#{releaseDate}",
-  "reviewScore": #{reviewScore},
+  "reviewScore": "#{reviewScore}",
   "category": "#{category}",
   "rating": "#{rating}"
 }

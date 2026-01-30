@@ -1,20 +1,28 @@
 package videogamedb.simulation;
 
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
+import videogamedb.scriptfundamentals.BaseSimulation;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
+import static data.EndpointEnum.VIDEO_GAME_ENDPOINT;
+import static io.gatling.javaapi.core.CoreDsl.atOnceUsers;
+import static io.gatling.javaapi.core.CoreDsl.constantUsersPerSec;
+import static io.gatling.javaapi.core.CoreDsl.exec;
+import static io.gatling.javaapi.core.CoreDsl.nothingFor;
+import static io.gatling.javaapi.core.CoreDsl.rampUsers;
+import static io.gatling.javaapi.core.CoreDsl.rampUsersPerSec;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
+import static io.gatling.javaapi.http.HttpDsl.http;
 
-public class VideoGameDbSimulations extends Simulation {
+public class VideoGameDbSimulations extends BaseSimulation {
 
-    private HttpProtocolBuilder httpProtocol = http
-            .baseUrl("https://videogamedb.uk/api")
-            .acceptHeader("application/json");
+    private static final HttpProtocolBuilder httpProtocol = buildHttpProtocol();
 
-    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "5"));
-    private static final int RAMP_DURATION = Integer.parseInt(System.getProperty("RAMP_DURATION", "10"));
-    private static final int TEST_DURATION = Integer.parseInt(System.getProperty("TEST_DURATION", "20"));
+    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "10"));
+    private static final int RAMP_USER_COUNT = Integer.parseInt(System.getProperty("RAMP_USERS", "10"));
+    private static final int RAMP_DURATION = Integer.parseInt(System.getProperty("RAMP_DURATION", "5"));
+    private static final int TEST_DURATION = Integer.parseInt(System.getProperty("TEST_DURATION", "30"));
 
     @Override
     public void before() {
@@ -23,30 +31,32 @@ public class VideoGameDbSimulations extends Simulation {
         System.out.printf("Total test duration: %d seconds%n", TEST_DURATION);
     }
 
-    private static ChainBuilder getAllVideoGames =
+    private static final ChainBuilder getAllVideoGames =
             exec(http("Get all video games")
-                    .get("/videogame"));
+                    .get(VIDEO_GAME_ENDPOINT.getName()));
 
-    private static ChainBuilder getSpecificGame =
+    private static final ChainBuilder getSpecificGame =
             exec(http("Get specific game")
-                    .get("/videogame/2"));
+                    .get(VIDEO_GAME_ENDPOINT.getName() + "/" + getRandomGameId()));
 
-    private ScenarioBuilder scn = scenario("Video game db - Section 7 code")
-            .forever().on(
-            exec(getAllVideoGames)
-            .pause(5)
-            .exec(getSpecificGame)
-            .pause(5)
+    private static final ScenarioBuilder scenario = scenario("Video game db - Section 7 code")
+            .exec(authenticate)
             .exec(getAllVideoGames)
-            );
+            .pause(1)
+            .exec(getSpecificGame)
+            .pause(1)
+            .exec(getAllVideoGames);
 
 
-    {
+    public VideoGameDbSimulations() {
         setUp(
-                scn.injectOpen(
-                        nothingFor(5),
-                        rampUsers(USER_COUNT).during(RAMP_DURATION)
-                ).protocols(httpProtocol)
-        ).maxDuration(TEST_DURATION);
+                scenario
+                        .injectOpen(
+                                nothingFor(5),
+                                rampUsersPerSec(1).to(RAMP_USER_COUNT).during(RAMP_DURATION),
+                                constantUsersPerSec(USER_COUNT).during(RAMP_DURATION),
+                                rampUsersPerSec(RAMP_USER_COUNT).to(1).during(RAMP_DURATION)
+                        )
+                        .protocols(httpProtocol));
     }
 }

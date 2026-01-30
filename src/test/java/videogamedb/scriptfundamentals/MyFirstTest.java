@@ -1,27 +1,23 @@
 package videogamedb.scriptfundamentals;
 
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.http.HttpDsl;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
+import static data.EndpointEnum.VIDEO_GAME_ENDPOINT;
+import static io.gatling.javaapi.core.CoreDsl.atOnceUsers;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
 
-public class MyFirstTest extends Simulation {
+@Deprecated
+public class MyFirstTest extends BaseSimulation {
 
-    // 1 Http Configuration
-    private HttpProtocolBuilder httpProtocol = http
-            .baseUrl("https://videogamedb.uk/api")
-            .acceptHeader("application/json");
+    private static final HttpProtocolBuilder httpProtocol = buildHttpProtocol();
+    private static final ScenarioBuilder scenario =
+            scenario("My First Test")
+                    .exec(HttpDsl.http("Get all games").get(VIDEO_GAME_ENDPOINT.getName()));
 
-    // 2 Scenario Definition
-    private ScenarioBuilder scn = scenario("My First Test")
-            .exec(http("Get all games")
-                    .get("/videogame"));
-
-    // 3 Load Simulation
-    {
-        setUp(
-                scn.injectOpen(atOnceUsers(1))
-        ).protocols(httpProtocol);
+    public MyFirstTest() {
+        setUp(scenario.injectOpen(atOnceUsers(1))).protocols(httpProtocol);
     }
+
 }

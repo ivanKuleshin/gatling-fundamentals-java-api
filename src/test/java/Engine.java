@@ -1,14 +1,17 @@
 import io.gatling.app.Gatling;
-import io.gatling.core.config.GatlingPropertiesBuilder;
 
 public class Engine {
 
   public static void main(String[] args) {
-    GatlingPropertiesBuilder props = new GatlingPropertiesBuilder()
-      .resourcesDirectory(IDEPathHelper.mavenResourcesDirectory.toString())
-      .resultsDirectory(IDEPathHelper.resultsDirectory.toString())
-      .binariesDirectory(IDEPathHelper.mavenBinariesDirectory.toString());
-
-    Gatling.fromMap(props.build());
+    String[] gatlingArgs = {
+      "--simulation", "videogamedb.simulation.VideoGameDbSimulations",
+      "--results-folder", IDEPathHelper.resultsDirectory.toString()
+    };
+    Gatling.main(gatlingArgs);
   }
+  // To run this main, you need to add the following JVM options:
+  // --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
+
+  // or just use maven command:
+  // ./mvnw gatling:test -Dgatling.simulationClass=videogamedb.simulation.VideoGameDbSimulations
 }
